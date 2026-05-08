@@ -1,0 +1,10 @@
+Qual é a capital do Brasil?|Rio de Janeiro|São Paulo|Brasília|Salvador|C
+Quem escreveu Dom Casmurro?|José de Alencar|Machado de Assis|Carlos Drummond|Guimarães Rosa|B
+Quantos planetas tem o sistema solar?|7|8|9|10|B
+Qual é o maior oceano do mundo?|Atlântico|Índico|Ártico|Pacífico|D
+Em que ano o Brasil foi descoberto?|1400|1498|1500|1502|C
+Qual elemento químico tem símbolo O?|Ouro|Oxigênio|Osmio|Ósmio|B
+Quanto é a raiz quadrada de 144?|11|12|13|14|B
+Qual país tem a maior população do mundo?|Índia|EUA|Brasil|China|D
+Quem pintou a Mona Lisa?|Michelangelo|Rafael|Da Vinci|Donatello|C
+Qual é o rio mais longo do mundo?|Amazonas|Nilo|Yangtzé|Mississipi|B
