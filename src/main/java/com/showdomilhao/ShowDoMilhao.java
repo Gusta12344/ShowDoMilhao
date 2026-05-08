@@ -14,7 +14,7 @@ public class ShowDoMilhao {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new TelaJogo().setVisible(true);
+            new TelaInicio().setVisible(true);
         });
     }
 }

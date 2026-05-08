@@ -21,6 +21,10 @@ private GerenciadorAjudas ajudas;
 private int indiceEscolhido = -1;
 private javax.swing.JButton[] botoesResposta;
 
+private com.showdomilhao.model.Jogador jogadorAtual;
+private com.showdomilhao.dao.JogadorDAO jogadorDAO = new com.showdomilhao.dao.JogadorDAO();
+private com.showdomilhao.dao.PartidaDAO partidaDAO = new com.showdomilhao.dao.PartidaDAO();
+
     public TelaJogo() {
         initComponents();
         
@@ -32,6 +36,20 @@ private javax.swing.JButton[] botoesResposta;
     this.pack();
     this.setLocationRelativeTo(null); // centraliza na tela
     }
+    
+    public TelaJogo(com.showdomilhao.model.Jogador jogador) {
+    initComponents(); 
+    this.jogadorAtual = jogador;
+    this.setTitle("Show do Milhão — " + jogador.getNome());
+
+
+    controlador = new ControladorJogo();
+    ajudas = new GerenciadorAjudas();
+    botoesResposta = new javax.swing.JButton[]{btnA, btnB, btnC, btnD};
+    carregarPergunta();
+    this.pack();
+    this.setLocationRelativeTo(null);
+}
     
     private void carregarPergunta() {
     Pergunta p = controlador.getPerguntaAtual();
@@ -75,11 +93,7 @@ private javax.swing.JButton[] botoesResposta;
         botoesResposta[controlador.getPerguntaAtual().getIndiceCorreto()]
             .setBackground(java.awt.Color.GREEN);
 
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "Resposta errada! Você ganha " +
-            ControladorJogo.formatarPremio(controlador.getPremioSeErrar()),
-            "Game Over", javax.swing.JOptionPane.ERROR_MESSAGE);
-        reiniciarJogo();
+        encerrarJogo(controlador.getPremioSeErrar());
     }
 }
     
@@ -97,22 +111,43 @@ private void mostrarAjudaUsada() {
     javax.swing.JOptionPane.showMessageDialog(this, "Ajuda já utilizada!");
 }
 
-private void reiniciarJogo() {
-    int opcao = javax.swing.JOptionPane.showConfirmDialog(this,
-        "Deseja jogar novamente?", "Jogar de novo?",
-        javax.swing.JOptionPane.YES_NO_OPTION);
-    if (opcao == javax.swing.JOptionPane.YES_OPTION) {
+private void encerrarJogo(int premioFinal) {
+    // Salva no banco somente se veio de um jogador logado
+    if (jogadorAtual != null) {
+        try {
+            jogadorDAO.atualizarMelhorPremio(jogadorAtual.getId(), premioFinal);
+            partidaDAO.registrarJogo(jogadorAtual.getId(), premioFinal);
+        } catch (java.sql.SQLException e) {
+            System.err.println("Erro ao salvar resultado: " + e.getMessage());
+        }
+    }
+
+    String premioFormatado = ControladorJogo.formatarPremio(premioFinal);
+    String nomeExibido = jogadorAtual != null ? jogadorAtual.getNome() : "Jogador";
+    String mensagem = nomeExibido + ", você ganhou:\n" + premioFormatado + "\n\nO que deseja fazer?";
+
+    String[] opcoes = {"🔄 Jogar Novamente", "🏅 Ver Ranking", "❌ Sair"};
+    int escolha = javax.swing.JOptionPane.showOptionDialog(this, mensagem, "Fim de Jogo",
+        javax.swing.JOptionPane.DEFAULT_OPTION,
+        javax.swing.JOptionPane.INFORMATION_MESSAGE,
+        null, opcoes, opcoes[0]);
+
+    if (escolha == 0) {
+        // Reinicia o jogo com o mesmo jogador
         controlador = new ControladorJogo();
         ajudas = new GerenciadorAjudas();
         for (javax.swing.JButton btn : botoesResposta) btn.setVisible(true);
-        // Reabilita botões de ajuda
-        btnCartas.setEnabled(true);
-        btnPlacas.setEnabled(true);
+        btnCartas.setEnabled(true);     btnPlacas.setEnabled(true);
         btnConvidados.setEnabled(true);
-        btnPular1.setEnabled(true);
-        btnPular2.setEnabled(true);
+        btnPular1.setEnabled(true);     btnPular2.setEnabled(true);
         btnPular3.setEnabled(true);
         carregarPergunta();
+
+    } else if (escolha == 1) {
+        TelaInicio inicio = new TelaInicio();
+        new TelaRanking(inicio).setVisible(true);
+        this.dispose();
+
     } else {
         System.exit(0);
     }
@@ -310,10 +345,7 @@ private void reiniciarJogo() {
     private void btnContinuarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinuarActionPerformed
         // TODO add your handling code here:
         if (controlador.isUltimaPergunta()) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "Parabéns! Você ganhou R$ 1.000.000!", "Campeão!",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        reiniciarJogo();
+       encerrarJogo(1_000_000);
     } else {
         controlador.avancar();
         carregarPergunta();
@@ -326,7 +358,7 @@ private void reiniciarJogo() {
         "Você decidiu parar! Ganha " +
         ControladorJogo.formatarPremio(controlador.getPremioAtual()),
         "Jogo encerrado", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-    reiniciarJogo();
+    encerrarJogo(controlador.getPremioAtual());
     }//GEN-LAST:event_btnPararActionPerformed
 
     private void btnCartasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCartasActionPerformed
