@@ -28,6 +28,9 @@ public class ControladorJogo {
     }
 
     public Pergunta getPerguntaAtual() {
+        if (nivelAtual >= TOTAL_PERGUNTAS) {
+            nivelAtual = TOTAL_PERGUNTAS - 1;
+        }
         return banco.getPergunta(nivelAtual);
     }
 
@@ -36,7 +39,9 @@ public class ControladorJogo {
     }
 
     public void avancar() {
-        nivelAtual++;
+        if (nivelAtual < TOTAL_PERGUNTAS - 1) {
+            nivelAtual++;
+        }
     }
 
     public boolean isUltimaPergunta() {

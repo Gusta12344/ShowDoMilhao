@@ -99,6 +99,15 @@ private com.showdomilhao.dao.PartidaDAO partidaDAO = new com.showdomilhao.dao.Pa
     
     private void usarPulo(javax.swing.JButton btnUsado) {
     if (!ajudas.podePular()) { mostrarAjudaUsada(); return; }
+    
+    // Verifica se já está na última pergunta
+    if (controlador.isUltimaPergunta()) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Não é possível pular a última pergunta!", "Ação inválida", 
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
     ajudas.usarPulo();
     btnUsado.setEnabled(false);
     controlador.avancar(); // pula a pergunta sem pontuar
